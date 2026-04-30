@@ -146,7 +146,7 @@ internal static class TypeScriptAppHostToolchainResolver
             InstallDependencies = CreateInstallCommand(toolchain),
             Execute = CreateExecuteCommand(toolchain, tsConfigFileName),
             WatchExecute = CreateWatchCommand(toolchain, tsConfigFileName),
-            PublishExecute = baseRuntimeSpec.PublishExecute,
+            PublishExecute = CreatePublishCommand(toolchain, tsConfigFileName),
             ExtensionLaunchCapability = baseRuntimeSpec.ExtensionLaunchCapability,
             MigrationFiles = baseRuntimeSpec.MigrationFiles
         };
@@ -222,6 +222,29 @@ internal static class TypeScriptAppHostToolchainResolver
                     "--ignore", ".modules/",
                     "--exec", $"pnpm exec tsx --tsconfig {tsConfigFileName} {{appHostFile}}"
                 ]
+            },
+            _ => throw new ArgumentOutOfRangeException(nameof(toolchain), toolchain, null)
+        };
+    }
+
+    private static CommandSpec CreatePublishCommand(TypeScriptAppHostToolchain toolchain, string tsConfigFileName)
+    {
+        return toolchain switch
+        {
+            TypeScriptAppHostToolchain.Bun => new CommandSpec
+            {
+                Command = "bun",
+                Args = ["run", "{appHostFile}", "--"]
+            },
+            TypeScriptAppHostToolchain.Yarn => new CommandSpec
+            {
+                Command = "yarn",
+                Args = ["exec", "tsx", "--tsconfig", tsConfigFileName, "{appHostFile}", "--"]
+            },
+            TypeScriptAppHostToolchain.Pnpm => new CommandSpec
+            {
+                Command = "pnpm",
+                Args = ["exec", "tsx", "--tsconfig", tsConfigFileName, "{appHostFile}", "--"]
             },
             _ => throw new ArgumentOutOfRangeException(nameof(toolchain), toolchain, null)
         };

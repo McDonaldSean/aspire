@@ -256,6 +256,30 @@ public class GuestRuntimeTests(ITestOutputHelper outputHelper)
     }
 
     [Fact]
+    public async Task PublishAsync_AdditionalArgsAppendedAfterSeparatorWhenNoPlaceholder()
+    {
+        var spec = CreateTestSpec(
+            execute: new CommandSpec
+            {
+                Command = "test-cmd",
+                Args = ["{appHostFile}"]
+            },
+            publishExecute: new CommandSpec
+            {
+                Command = "test-cmd",
+                Args = ["{appHostFile}", "--"]
+            });
+        var runtime = CreateRuntime(spec);
+        var launcher = new RecordingLauncher();
+        var appHostFile = new FileInfo("/tmp/apphost.ts");
+        var directory = new DirectoryInfo("/tmp");
+
+        await runtime.PublishAsync(appHostFile, directory, new Dictionary<string, string>(), ["--operation", "publish"], launcher, CancellationToken.None);
+
+        Assert.Equal([appHostFile.FullName, "--", "--operation", "publish"], launcher.LastArgs);
+    }
+
+    [Fact]
     public async Task RunAsync_EmptyPlaceholderReplacementsAreSkipped()
     {
         var spec = CreateTestSpec(execute: new CommandSpec

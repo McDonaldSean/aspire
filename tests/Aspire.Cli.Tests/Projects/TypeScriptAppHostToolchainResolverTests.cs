@@ -184,6 +184,9 @@ public sealed class TypeScriptAppHostToolchainResolverTests(ITestOutputHelper ou
         Assert.NotNull(runtimeSpec.WatchExecute);
         Assert.Equal("bun", runtimeSpec.WatchExecute?.Command);
         Assert.Equal(["--watch", "run", "{appHostFile}"], runtimeSpec.WatchExecute!.Args);
+        Assert.NotNull(runtimeSpec.PublishExecute);
+        Assert.Equal("bun", runtimeSpec.PublishExecute?.Command);
+        Assert.Equal(["run", "{appHostFile}", "--"], runtimeSpec.PublishExecute!.Args);
         Assert.Equal("node", runtimeSpec.ExtensionLaunchCapability);
     }
 
@@ -198,6 +201,25 @@ public sealed class TypeScriptAppHostToolchainResolverTests(ITestOutputHelper ou
         Assert.Equal(["exec", "tsx", "--tsconfig", "tsconfig.apphost.json", "{appHostFile}"], runtimeSpec.Execute.Args);
         Assert.Equal("yarn", runtimeSpec.WatchExecute?.Command);
         Assert.Contains("yarn exec tsx --tsconfig tsconfig.apphost.json {appHostFile}", runtimeSpec.WatchExecute?.Args ?? []);
+        var publishExecute = Assert.IsType<CommandSpec>(runtimeSpec.PublishExecute);
+        Assert.Equal("yarn", publishExecute.Command);
+        Assert.Equal(["exec", "tsx", "--tsconfig", "tsconfig.apphost.json", "{appHostFile}", "--"], publishExecute.Args);
+    }
+
+    [Fact]
+    public void ApplyToRuntimeSpec_WhenPnpmSelected_UsesPnpmExecCommands()
+    {
+        var baseRuntimeSpec = CreateBaseRuntimeSpec();
+
+        var runtimeSpec = TypeScriptAppHostToolchainResolver.ApplyToRuntimeSpec(baseRuntimeSpec, TypeScriptAppHostToolchain.Pnpm);
+
+        Assert.Equal("pnpm", runtimeSpec.Execute.Command);
+        Assert.Equal(["exec", "tsx", "--tsconfig", "tsconfig.apphost.json", "{appHostFile}"], runtimeSpec.Execute.Args);
+        Assert.Equal("pnpm", runtimeSpec.WatchExecute?.Command);
+        Assert.Contains("pnpm exec tsx --tsconfig tsconfig.apphost.json {appHostFile}", runtimeSpec.WatchExecute?.Args ?? []);
+        var publishExecute = Assert.IsType<CommandSpec>(runtimeSpec.PublishExecute);
+        Assert.Equal("pnpm", publishExecute.Command);
+        Assert.Equal(["exec", "tsx", "--tsconfig", "tsconfig.apphost.json", "{appHostFile}", "--"], publishExecute.Args);
     }
 
     private static RuntimeSpec CreateBaseRuntimeSpec()

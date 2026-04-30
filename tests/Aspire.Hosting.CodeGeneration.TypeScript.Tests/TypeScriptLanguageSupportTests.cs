@@ -192,8 +192,11 @@ public sealed class TypeScriptLanguageSupportTests
     {
         var runtimeSpec = _languageSupport.GetRuntimeSpec();
         var watchExecute = Assert.IsType<CommandSpec>(runtimeSpec.WatchExecute);
+        var publishExecute = Assert.IsType<CommandSpec>(runtimeSpec.PublishExecute);
 
         Assert.Equal(new[] { "--no-install", "tsx", "--tsconfig", "tsconfig.apphost.json", "{appHostFile}" }, runtimeSpec.Execute.Args);
+        Assert.Equal("npx", publishExecute.Command);
+        Assert.Equal(new[] { "--no-install", "tsx", "--tsconfig", "tsconfig.apphost.json", "{appHostFile}", "--" }, publishExecute.Args);
         Assert.Contains("npx --no-install tsx --tsconfig tsconfig.apphost.json {appHostFile}", watchExecute.Args);
     }
 

@@ -262,6 +262,11 @@ internal sealed class TypeScriptLanguageSupport : ILanguageSupport
                 Command = "npx",
                 Args = ["--no-install", "tsx", "--tsconfig", AppHostTsConfigFileName, "{appHostFile}"]
             },
+            PublishExecute = new CommandSpec
+            {
+                Command = "npx",
+                Args = ["--no-install", "tsx", "--tsconfig", AppHostTsConfigFileName, "{appHostFile}", "--"]
+            },
             WatchExecute = new CommandSpec
             {
                 Command = "npx",
