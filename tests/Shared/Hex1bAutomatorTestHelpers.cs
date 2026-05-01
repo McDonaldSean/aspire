@@ -459,7 +459,6 @@ internal static class Hex1bAutomatorTestHelpers
             .Find("configure AI agent environments");
 
         var agentInitFound = false;
-        var agentInitPromptRequiresEnter = false;
         var errorPromptFound = false;
 
         // Wait for either the agent init prompt (new CLI) or the success prompt (old CLI).
@@ -468,10 +467,6 @@ internal static class Hex1bAutomatorTestHelpers
             if (agentInitPrompt.Search(s).Count > 0)
             {
                 agentInitFound = true;
-                agentInitPromptRequiresEnter = new CellPatternSearcher()
-                    .Find("[Y/n]")
-                    .RightText(": ")
-                    .Search(s).Count > 0;
                 return true;
             }
             var successSearcher = new CellPatternSearcher()
@@ -502,11 +497,31 @@ internal static class Hex1bAutomatorTestHelpers
 
         await auto.WaitAsync(500);
         await auto.TypeAsync("n");
-        if (agentInitPromptRequiresEnter)
+
+        var successPromptFound = false;
+        try
         {
-            await auto.EnterAsync();
+            await auto.WaitUntilAsync(s =>
+            {
+                var successSearcher = new CellPatternSearcher()
+                    .FindPattern(counter.Value.ToString())
+                    .RightText(" OK] $ ");
+                successPromptFound = successSearcher.Search(s).Count > 0;
+
+                return successPromptFound;
+            }, timeout: TimeSpan.FromSeconds(2), description: $"success prompt [{counter.Value} OK] $ after agent init response");
+        }
+        catch (Hex1bAutomationException)
+        {
         }
 
+        if (successPromptFound)
+        {
+            counter.Increment();
+            return;
+        }
+
+        await auto.EnterAsync();
         await auto.WaitForSuccessPromptFailFastAsync(counter, effectiveTimeout);
     }
 
