@@ -173,7 +173,7 @@ internal static class TypeScriptAppHostToolchainResolver
             TypeScriptAppHostToolchain.Yarn => new CommandSpec
             {
                 Command = "yarn",
-                Args = ["exec", "tsx", "--tsconfig", tsConfigFileName, "{appHostFile}"]
+                Args = ["run", "tsx", "--tsconfig", tsConfigFileName, "{appHostFile}"]
             },
             TypeScriptAppHostToolchain.Pnpm => new CommandSpec
             {
@@ -205,7 +205,7 @@ internal static class TypeScriptAppHostToolchainResolver
                     "--ext", "ts",
                     "--ignore", "node_modules/",
                     "--ignore", ".modules/",
-                    "--exec", $"yarn exec tsx --tsconfig {tsConfigFileName} {{appHostFile}}"
+                    "--exec", $"yarn run tsx --tsconfig {tsConfigFileName} {{appHostFile}}"
                 ]
             },
             TypeScriptAppHostToolchain.Pnpm => new CommandSpec
@@ -239,7 +239,7 @@ internal static class TypeScriptAppHostToolchainResolver
             TypeScriptAppHostToolchain.Yarn => new CommandSpec
             {
                 Command = "yarn",
-                Args = ["exec", "tsx", "--tsconfig", tsConfigFileName, "{appHostFile}", "--"]
+                Args = ["run", "tsx", "--tsconfig", tsConfigFileName, "{appHostFile}", "--"]
             },
             TypeScriptAppHostToolchain.Pnpm => new CommandSpec
             {

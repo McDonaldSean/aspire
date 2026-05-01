@@ -191,19 +191,19 @@ public sealed class TypeScriptAppHostToolchainResolverTests(ITestOutputHelper ou
     }
 
     [Fact]
-    public void ApplyToRuntimeSpec_WhenYarnSelected_UsesYarnExecCommands()
+    public void ApplyToRuntimeSpec_WhenYarnSelected_UsesYarnRunCommands()
     {
         var baseRuntimeSpec = CreateBaseRuntimeSpec();
 
         var runtimeSpec = TypeScriptAppHostToolchainResolver.ApplyToRuntimeSpec(baseRuntimeSpec, TypeScriptAppHostToolchain.Yarn);
 
         Assert.Equal("yarn", runtimeSpec.Execute.Command);
-        Assert.Equal(["exec", "tsx", "--tsconfig", "tsconfig.apphost.json", "{appHostFile}"], runtimeSpec.Execute.Args);
+        Assert.Equal(["run", "tsx", "--tsconfig", "tsconfig.apphost.json", "{appHostFile}"], runtimeSpec.Execute.Args);
         Assert.Equal("yarn", runtimeSpec.WatchExecute?.Command);
-        Assert.Contains("yarn exec tsx --tsconfig tsconfig.apphost.json {appHostFile}", runtimeSpec.WatchExecute?.Args ?? []);
+        Assert.Contains("yarn run tsx --tsconfig tsconfig.apphost.json {appHostFile}", runtimeSpec.WatchExecute?.Args ?? []);
         var publishExecute = Assert.IsType<CommandSpec>(runtimeSpec.PublishExecute);
         Assert.Equal("yarn", publishExecute.Command);
-        Assert.Equal(["exec", "tsx", "--tsconfig", "tsconfig.apphost.json", "{appHostFile}", "--"], publishExecute.Args);
+        Assert.Equal(["run", "tsx", "--tsconfig", "tsconfig.apphost.json", "{appHostFile}", "--"], publishExecute.Args);
     }
 
     [Fact]
