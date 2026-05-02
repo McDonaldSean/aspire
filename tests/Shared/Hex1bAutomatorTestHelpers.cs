@@ -403,11 +403,17 @@ internal static class Hex1bAutomatorTestHelpers
     {
         var effectiveTimeout = timeout ?? TimeSpan.FromMinutes(2);
         var sawVersionPrompt = false;
+
+        // Use counter.Value + 1 for the prompt searchers because the current counter value
+        // is already visible on the prompt line where 'aspire add' was typed (e.g., "[6 OK] $ aspire add ...").
+        // Searching for the current value would match that stale prompt immediately.
+        // The NEXT prompt (counter.Value + 1) only appears after 'aspire add' finishes.
+        var nextPromptValue = (counter.Value + 1).ToString();
         var successPrompt = new CellPatternSearcher()
-            .FindPattern(counter.Value.ToString())
+            .FindPattern(nextPromptValue)
             .RightText(" OK] $ ");
         var errorPrompt = new CellPatternSearcher()
-            .FindPattern(counter.Value.ToString())
+            .FindPattern(nextPromptValue)
             .RightText(" ERR:");
         var waitingForVersionSelection = new CellPatternSearcher()
             .Find("What version would you like to install?");
